@@ -13,73 +13,146 @@
 
 ## 2. Technical Stack
 
-RingCentral API · Python · Node.js · OAuth/JWT · Claude/GPT API · Google Sheets API
+- **Backend:** Python (FastAPI)
+- **Frontend:** Node.js with modern framework (optional)
+- **Database:** PostgreSQL with connection pooling
+- **AI/ML:** OpenAI GPT-4 / Anthropic Claude API
+- **Task Queue:** Celery with Redis broker
+- **Serverless:** AWS Lambda / Cloudflare Workers ready
+- **Orchestration:** ETL pipeline with Apache Airflow (optional)
+- **Infrastructure:** Docker, Docker Compose, AWS
 
-## 3. Architecture
+## 3. Core Features
 
-- Backend: Python (FastAPI/Flask/Django) REST API
-- AI/ML: Model integration (OpenAI/Anthropic API or self-hosted)
-- Serverless: AWS Lambda / Vercel / Cloudflare Functions
-- Data: ETL pipeline with task orchestration
+### 3.1 RingCentral Integration
+- OAuth 2.0 authentication flow
+- Webhook subscriptions for call events
+- Call recording download and storage
+- Call metadata extraction (duration, participants, timestamps)
 
-### API Design
-- RESTful endpoints with JSON request/response
-- Authentication via JWT (HS256) or bcrypt
-- Middleware for logging, error handling, CORS
-- Versioned routes (/api/v1/...) where applicable
+### 3.2 AI-Powered Summarization
+- Automatic call transcription (via external service or RingCentral native)
+- AI-generated summaries using GPT-4 or Claude
+- Sentiment analysis
+- Action item extraction
+- Key topic identification
 
-### Data Layer
-- PostgreSQL as primary datastore
-- Connection pooling via PGBouncer or similar
-- Migration management via Alembic or raw SQL
-- Indexes on foreign keys and high-cardinality columns
+### 3.3 Data Pipeline
+- ETL pipeline for processing call data
+- Background job processing with Celery
+- Retry logic with exponential backoff
+- Dead letter queue for failed jobs
 
-### Frontend (if applicable)
-- Single-page application or server-rendered pages
-- Responsive UI with modern CSS/JS framework
-- State management for complex client-side logic
+### 3.4 API Endpoints
+- RESTful API with JSON request/response
+- JWT authentication (HS256)
+- Rate limiting and throttling
+- Comprehensive error handling
+- Request validation with Pydantic
 
 ## 4. Data Model
 
-### Core Entities
-- Define entity schema based on job requirements
-- Use UUIDs for primary keys (not auto-increment)
-- Add created_at / updated_at timestamps to all tables
-- Soft-delete pattern where appropriate
+### 4.1 Core Entities
 
-### Relationships
-- Foreign key constraints with ON DELETE CASCADE
-- Many-to-many via junction tables
-- Eager loading for nested relationships in API
+**User**
+- id (UUID, PK)
+- email (unique)
+- password_hash
+- ringcentral_refresh_token
+- ringcentral_access_token
+- created_at, updated_at
 
-## 5. Project Structure
+**Call**
+- id (UUID, PK)
+- ringcentral_call_id
+- user_id (FK -> User)
+- direction (inbound/outbound)
+- status (completed/missed/voicemail)
+- duration_seconds
+- started_at
+- ended_at
+- recording_url
+- created_at, updated_at
 
-```
-├── api/                  # FastAPI / Express routes + schemas
-├── models/               # DB models / SQLAlchemy / Prisma
-├── services/             # Business logic layer
-├── workers/              # Background jobs (Celery, BullMQ, etc.)
-├── migrations/           # DB migrations (Alembic / Flyway)
-├── tests/                # Unit + integration tests
-├── Dockerfile            # Production container
-├── docker-compose.yml    # Local dev environment
-└── README.md             # Setup instructions
-```
+**CallSummary**
+- id (UUID, PK)
+- call_id (FK -> Call, unique)
+- transcript_text
+- summary_text
+- sentiment_score
+- action_items (JSON array)
+- key_topics (JSON array)
+- ai_provider (openai/anthropic)
+- processing_status
+- created_at, updated_at
 
-## 6. Out of Scope
+**WebhookEvent**
+- id (UUID, PK)
+- event_type
+- event_id (unique)
+- payload (JSON)
+- processed (boolean)
+- processed_at
+- created_at
 
-- Mobile apps (web only unless explicitly specified)
-- Multi-tenant / white-label customization
-- Performance optimization at 1M+ user scale
+### 4.2 Indexes
+- Index on Call.user_id
+- Index on Call.started_at
+- Index on CallSummary.call_id
+- Index on WebhookEvent.event_id
+- Index on WebhookEvent.event_type
+- Composite index on WebhookEvent(processed, created_at)
 
-## 7. Acceptance Criteria
+## 5. API Design
 
-- [ ] REST API with all planned endpoints implemented and returning JSON
-- [ ] Authentication system (login/logout/JWT or OAuth)
-- [ ] Frontend UI implemented, responsive, and functional
-- [ ] Unit tests covering core functionality
-- [ ] README with setup, run, and API documentation
-- [ ] AI/ML pipeline integrated and functional
-- [ ] ETL pipeline processing data end-to-end
+### 5.1 Authentication
+- POST /api/v1/auth/register - User registration
+- POST /api/v1/auth/login - User login (returns JWT)
+- POST /api/v1/auth/refresh - Refresh access token
+- POST /api/v1/auth/ringcentral/connect - Initiate RingCentral OAuth
+- GET /api/v1/auth/ringcentral/callback - OAuth callback
 
-**GitHub Repo:** https://github.com/9KMan/JOB-20260614011259-000092
+### 5.2 Calls
+- GET /api/v1/calls - List calls (paginated, filterable)
+- GET /api/v1/calls/{id} - Get call details
+- GET /api/v1/calls/{id}/summary - Get AI summary
+- POST /api/v1/calls/{id}/summarize - Trigger re-summarization
+
+### 5.3 Webhooks
+- POST /api/v1/webhooks/ringcentral - RingCentral webhook endpoint
+
+### 5.4 Health
+- GET /api/v1/health - Health check
+
+## 6. Configuration
+
+Environment variables:
+- DATABASE_URL
+- REDIS_URL
+- JWT_SECRET_KEY
+- JWT_ALGORITHM
+- RINGCENTRAL_CLIENT_ID
+- RINGCENTRAL_CLIENT_SECRET
+- RINGCENTRAL_SERVER_URL
+- RINGCENTRAL_WEBHOOK_SECRET
+- OPENAI_API_KEY
+- ANTHROPIC_API_KEY
+- LOG_LEVEL
+
+## 7. Error Handling
+
+- Structured error responses with error codes
+- HTTP status codes: 400 (bad request), 401 (unauthorized), 404 (not found), 500 (server error)
+- Error logging with correlation IDs
+- Graceful degradation for AI service failures
+
+## 8. Acceptance Criteria
+
+- [ ] Users can authenticate via RingCentral OAuth
+- [ ] Call events are received via webhooks
+- [ ] Calls are stored with metadata
+- [ ] AI summaries are generated automatically
+- [ ] API returns paginated call lists
+- [ ] Background jobs process summaries
+- [ ] System handles failures gracefully
+- [ ] Unit tests cover core functionality
