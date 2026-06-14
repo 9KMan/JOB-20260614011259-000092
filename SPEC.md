@@ -1,42 +1,30 @@
-# Specification: RingCentral Call Summary Pipeline
+# RingCentral Call Summary Pipeline - Specification
 
 ## 1. Project Overview
 
-**Project Name:** RingCentral Call Summary Pipeline
-**GitHub Repo:** https://github.com/9KMan/JOB-20260614011259-000092
-**Client:** RingCentral Client (Upwork)
-**Tier:** EXPERT
-**Budget:** $20-$60/hr hourly, 1-3 months, <30 hrs/week
-**Lead:** https://www.upwork.com/jobs/~022065963408978544115
+**Project Name:** RingCentral Call Summary Pipeline  
+**GitHub Repo:** https://github.com/9KMan/JOB-20260614011259-000092  
+**Lead:** https://www.upwork.com/jobs/~022065963408978544115  
+**Client:** RingCentral Client (Upwork)  
+**Tier:** EXPERT  
+**Budget:** $20-$60/hr hourly, 1-3 months, <30 hrs/week  
+**Timeline:** 1-3 months
 
-### Objectives
-- Build a pipeline that processes RingCentral call data
-- Generate AI-powered summaries of calls
-- Store and manage call metadata and summaries
-- Provide REST API for integration with external systems
+## 2. Problem Statement
 
-## 2. Technical Stack
+Organizations need automated extraction and summarization of call data from RingCentral, processing call recordings, transcriptions, and metadata to generate actionable insights. The pipeline must handle high volumes of calls efficiently while providing accurate AI-powered summaries.
 
-### Backend
-- **Framework:** Python 3.11+ with FastAPI
-- **Database:** PostgreSQL 15+ with SQLAlchemy 2.0
+## 3. Technical Stack
+
+- **Backend:** Python 3.11+ with FastAPI
+- **Database:** PostgreSQL 15+ with SQLAlchemy ORM
+- **AI/ML:** OpenAI GPT-4 / Anthropic Claude API integration
 - **Task Queue:** Celery with Redis broker
-- **API Documentation:** OpenAPI/Swagger (built-in FastAPI)
+- **Cloud:** AWS Lambda / EC2 compatible
+- **Authentication:** JWT (HS256) tokens
+- **Container:** Docker + Docker Compose
 
-### Infrastructure
-- **Containerization:** Docker + Docker Compose
-- **Cloud:** AWS Lambda / Vercel / Cloudflare Functions ready
-- **Monitoring:** Structured logging with JSON output
+## 4. Architecture
 
-### AI/ML Integration
-- **Primary:** OpenAI GPT-4 API
-- **Alternative:** Anthropic Claude API
-- **Model Config:** Configurable via environment variables
+### 4.1 High-Level Components
 
-### Third-Party APIs
-- **RingCentral API:** Webhook integration for call events
-- **Google Sheets API:** Optional export capability
-
-## 3. Architecture
-
-### High-Level Architecture
