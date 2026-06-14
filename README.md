@@ -179,6 +179,16 @@ JOB-20260614011259-000092/
     └─────────────┘ └─────────────┘ └─────────────┘
 ```
 
+## Key Technical Decisions
+
+1. **Python + FastAPI (not Node.js)** — Better async support for parallel API calls, richer ecosystem for data pipeline work (pandas, pydantic)
+
+2. **PostgreSQL over Sheets-as-DB** — Sheets is for *output*; raw RingSense data needs durable storage because RingCentral truncates at 90 days
+
+3. **Claude over GPT** — Per your preference; better at structured extraction tasks
+
+4. **JWT server-only auth** — No OAuth redirect flow needed; simpler, more secure for backend-only pipeline
+
 ## Configuration
 
 Environment variables can be set in `.env`:
