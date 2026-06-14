@@ -1,9 +1,10 @@
-# Specification: RingCentral Call Summary Pipeline
+# RingCentral Call Summary Pipeline - Technical Specification
 
 ## 1. Project Overview
 
-**Project:** RingCentral Call Summary Pipeline
+**Project Name:** RingCentral Call Summary Pipeline
 **GitHub Repo:** https://github.com/9KMan/JOB-20260614011259-000092
+**Project Type:** Backend ETL Pipeline with REST API
 **Lead:** https://www.upwork.com/jobs/~022065963408978544115
 **Client:** RingCentral Client (Upwork)
 **Tier:** EXPERT
@@ -13,13 +14,18 @@
 
 ## 2. Technical Stack
 
-- **Backend:** Python (FastAPI) REST API
-- **Database:** PostgreSQL with SQLAlchemy ORM
-- **Migrations:** Alembic
-- **AI/ML:** OpenAI/Anthropic API integration for call summaries
-- **Queue:** Celery with Redis for background tasks
-- **Deployment:** Docker, AWS Lambda ready
-- **Authentication:** JWT (HS256)
+| Component | Technology |
+|-----------|------------|
+| Backend API | Python 3.11+ with FastAPI |
+| ORM | SQLAlchemy 2.0+ |
+| Database | PostgreSQL 15+ |
+| Migrations | Alembic |
+| Authentication | JWT (HS256) |
+| Task Queue | Celery with Redis |
+| Containerization | Docker + Docker Compose |
+| Cloud Deployment | AWS (Lambda, ECS, or EKS) |
+| AI Integration | OpenAI GPT-4 / Anthropic Claude |
+| External APIs | RingCentral API, Google Sheets API |
 
-## 3. Architecture
+## 3. Architecture Overview
 
